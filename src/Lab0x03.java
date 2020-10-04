@@ -51,7 +51,9 @@ public class Lab0x03 {
 
     }
 
+    /** Simple Brute Force Algorithm that checks every combination of numbers to find all 0 sums **/
     public static List<Integer[]> BruteForce(List<Integer> list) {
+        // Sort list and remove duplicates
         Sorting.QuickSort(list);
         for(int i = 1; i < list.size(); i++)
             if(list.get(i-1).equals(list.get(i)))
@@ -61,32 +63,35 @@ public class Lab0x03 {
         Integer[] set = new Integer[3];
 
         for(int i = 0; i < list.size(); i++) {
-            set[0] = list.remove(i);
+            set[0] = list.remove(i); // Select first number
 
             for(int j = i; j < list.size(); j++) {
-                set[1] = list.remove(j);
+                set[1] = list.remove(j); // Select Second Number
 
                 for(int k = j; k < list.size(); k++) {
-                    set[2] = list.remove(k);
+                    set[2] = list.remove(k); // Select Third Number
 
+                    // Check if Sum is 0
                     int sum = 0;
                     for(int x : set) sum += x;
                     if(sum == 0)
                         result.add(new Integer[] {set[0],set[1],set[2]});
 
-                    list.add(k,set[2]);
+                    list.add(k,set[2]); // Return Third Number
                 }
 
-                list.add(j,set[1]);
+                list.add(j,set[1]); // Return Second Number
             }
 
-            list.add(i,set[0]);
+            list.add(i,set[0]); // Return First Number
         }
 
         return result;
     }
 
+    /** Faster algorithm chooses two numbers and uses binary search to find the next desired number **/
     public static List<Integer[]> Faster(List<Integer> list) {
+        // Sort list and remove duplicates
         Sorting.QuickSort(list);
         for(int i = 1; i < list.size(); i++)
             if(list.get(i-1).equals(list.get(i)))
@@ -96,11 +101,12 @@ public class Lab0x03 {
         Integer[] set = new Integer[3];
 
         for(int i = 0; i < list.size(); i++) {
-            set[0] = list.remove(i);
+            set[0] = list.remove(i); // Select First Number
 
             for(int j = i; j < list.size(); j++) {
-                set[1] = list.remove(j);
+                set[1] = list.remove(j); // Select Second Number
 
+                // Binary Search to Find Third Number
                 int low = j, high = list.size();
                 while(low < high) {
                     if(-list.get((low+high)/2) == set[0] + set[1]) {
@@ -111,16 +117,18 @@ public class Lab0x03 {
                     else low = (low+high)/2+1;
                 }
 
-                list.add(j,set[1]);
+                list.add(j,set[1]); // Return Second Number
             }
 
-            list.add(i,set[0]);
+            list.add(i,set[0]); // Return First Number
         }
 
         return result;
     }
 
+    /** I referenced wikipedia (https://en.wikipedia.org/wiki/3SUM) and found that this is referred to as the Quadratic Algorithm **/
     public static List<Integer[]> Fastest(List<Integer> list) {
+        // Sort list and remove duplicates
         Sorting.QuickSort(list);
         for(int i = 1; i < list.size(); i++)
             if(list.get(i-1).equals(list.get(i)))
@@ -130,17 +138,17 @@ public class Lab0x03 {
         Integer[] set = new Integer[3];
 
         for(int i = 0; i < list.size(); i++) {
-            set[0] = list.get(i);
-            int start = i+1, end = list.size()-1;
+            set[0] = list.get(i); // Select First Number
+            int start = i+1, end = list.size()-1; // Start checking both the start and end of the remaining list
             while(start < end) {
-                set[1] = list.get(start);
-                set[2] = list.get(end);
-                if (set[0] + set[1] + set[2] == 0) {
+                set[1] = list.get(start); // Select Second Number
+                set[2] = list.get(end); // Select Third Number
+                if (set[0] + set[1] + set[2] == 0) { // If the sum is zero then track result and keep looking
                     result.add(new Integer[] {set[0],set[1],set[2]});
                     start++;
                     end--;
-                } else if(set[0] + set[1] + set[2] > 0) end--;
-                else start++;
+                } else if(set[0] + set[1] + set[2] > 0) end--; // If the sum is greater than zero then we change the third number to a smaller number (since it is sorted we can change it to the number before it)
+                else start++; // If the sum is smaller than zero then we change the second number to a larger number (since it is sorted we can change it to the number after it)
             }
         }
 
@@ -148,32 +156,11 @@ public class Lab0x03 {
     }
 
     public static List<Integer> GenerateData(int N, int min, int max) {
+        // Generate List of N numbers between min and max
         Random rng = new Random();
         List<Integer> list = new ArrayList<>();
         for(int i = 0; i < N; i++) list.add(rng.nextInt(max-min)+min);
         return list;
-    }
-
-    public static boolean Equals(Integer[] set1, Integer[] set2) {
-        for(Integer x1 : set1) {
-            boolean match = false;
-            for(Integer x2 : set2)
-                if (x1 == x2) {
-                    match = true;
-                    break;
-                }
-            if(!match) return false;
-        }
-        for(Integer x2 : set2) {
-            boolean match = false;
-            for(Integer x1 : set1)
-                if(x1 == x2) {
-                    match = true;
-                    break;
-                }
-            if(!match) return false;
-        }
-        return true;
     }
 
     /** Get CPU time in nanoseconds since the program(thread) started. */
